@@ -1,0 +1,94 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smart-desk-monitor"
+version = "0.1.0"
+description = "Object detection and tracking pipeline for desk/workspace monitoring"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+]
+keywords = ["object-detection", "tracking", "computer-vision", "mask-rcnn", "sort"]
+
+dependencies = [
+    "numpy>=1.21.0",
+    "opencv-python>=4.5.0",
+    "torch>=1.9.0",
+    "torchvision>=0.10.0",
+    "filterpy>=1.4.5",
+    "scipy>=1.7.0",
+    "tqdm>=4.60.0",
+    "PyYAML>=5.4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
+]
+docs = [
+    "sphinx>=5.0.0",
+    "sphinx-rtd-theme>=1.0.0",
+    "myst-parser>=0.18.0",
+]
+
+[project.scripts]
+smart-desk-monitor = "smart_desk_monitor.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/smart-desk-monitor"
+Documentation = "https://github.com/yourusername/smart-desk-monitor#readme"
+Repository = "https://github.com/yourusername/smart-desk-monitor"
+Issues = "https://github.com/yourusername/smart-desk-monitor/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+smart_desk_monitor = ["py.typed"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["smart_desk_monitor"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+show_error_codes = true
+files = ["src/smart_desk_monitor"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"

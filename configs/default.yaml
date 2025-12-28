@@ -1,0 +1,76 @@
+# Smart Desk Monitor Configuration
+# =================================
+# This file contains all configurable parameters for the detection
+# and tracking pipeline. Adjust values based on your use case.
+
+# Detection Configuration
+detector:
+  # Model to use: maskrcnn_resnet50_fpn (more options in future)
+  model_name: maskrcnn_resnet50_fpn
+  
+  # Device: "auto", "cuda", or "cpu"
+  # "auto" will use CUDA if available
+  device: auto
+  
+  # Default confidence threshold for detections
+  default_confidence: 0.3
+  
+  # Per-class confidence thresholds (optional)
+  # Higher thresholds reduce false positives for common objects
+  class_thresholds:
+    1: 0.6    # person - higher threshold
+    64: 0.2   # laptop
+    46: 0.2   # bowl
+    42: 0.2   # cup
+    40: 0.3   # bottle
+
+# Tracker Configuration (SORT algorithm)
+tracker:
+  # Maximum frames to keep a track alive without detections
+  max_age: 8
+  
+  # Minimum detections before a track is confirmed
+  min_hits: 3
+  
+  # Minimum IoU for detection-to-track association
+  iou_threshold: 0.3
+  
+  # Kalman filter noise parameters
+  process_noise: 0.1
+  measurement_noise: 5.0
+
+# Video Processing Configuration
+video:
+  # Target resolution for processing
+  # Videos will be resized to this resolution
+  target_width: 1920
+  target_height: 1080
+  
+  # Maximum frames to sample from each video
+  max_frames: 100
+  
+  # Supported video formats
+  supported_formats:
+    - .mp4
+    - .mkv
+    - .avi
+    - .mov
+
+# Output Configuration
+output:
+  # Directory for all outputs
+  output_dir: output
+  
+  # Save frames with tracking visualizations
+  save_tracked_frames: true
+  
+  # Save COCO-format JSON annotations
+  save_coco_json: true
+  
+  # Visualization parameters
+  visualization_line_thickness: 2
+  visualization_font_scale: 0.6
+
+# Logging Configuration
+log_level: INFO  # DEBUG, INFO, WARNING, ERROR
+log_file: null   # Set to a path to enable file logging
