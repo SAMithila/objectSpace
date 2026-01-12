@@ -1,0 +1,55 @@
+# Evaluation Framework Configuration
+# These settings control how tracking quality is assessed
+
+evaluation:
+  # Minimum track length (frames) for a track to not be flagged as "short"
+  # Short tracks often indicate false positive detections
+  min_track_length: 5
+  
+  # IoU threshold for detecting potential ID switches
+  # When a track disappears and a new track appears with IoU > this value,
+  # it's flagged as a potential ID switch
+  id_switch_iou_threshold: 0.3
+  
+  # Maximum distance (pixels) between track endpoints to consider as ID switch
+  # If the new track starts within this distance of where old track ended,
+  # it may be an ID switch even without IoU overlap
+  id_switch_distance_threshold: 100.0
+  
+  # Target FPS for speed scoring
+  # The speed score measures how close the pipeline is to real-time processing
+  target_fps: 30.0
+  
+  # Output settings
+  output:
+    # Format for evaluation reports: console, json, markdown, or all
+    format: all
+    
+    # Include per-track details in reports
+    include_details: true
+    
+    # Use colored console output (auto-detected for non-TTY)
+    use_colors: true
+
+# Score thresholds for quality assessment
+scoring:
+  # Continuity score weights
+  # - coverage_ratio: How complete tracks are (no gaps)
+  # - fragmentation_rate: Percentage of tracks with gaps
+  # - short_track_rate: Percentage of very short tracks
+  continuity:
+    coverage_weight: 0.4
+    fragmentation_weight: 0.35
+    short_track_weight: 0.25
+  
+  # Stability score thresholds
+  # Based on ID switches per 100 frames
+  stability:
+    excellent: 0.5   # <= 0.5 switches/100 frames = 100 score
+    acceptable: 2.0  # <= 2.0 switches/100 frames = 70-100 score
+    poor: 5.0        # <= 5.0 switches/100 frames = 30-70 score
+  
+  # Speed score
+  # Score is 100 when FPS >= target, scales linearly below
+  speed:
+    target_fps: 30.0
