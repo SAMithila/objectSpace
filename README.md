@@ -9,6 +9,7 @@ A production-quality object detection and tracking pipeline for desk/workspace m
 
 - **Object Detection**: Pre-trained Mask R-CNN with per-class confidence thresholds
 - **Multi-Object Tracking**: SORT algorithm with 8D Kalman filtering
+- **Self-Supervised Evaluation**: Track quality metrics without ground truth
 - **Modular Architecture**: Clean separation of concerns for easy extension
 - **Multiple Output Formats**: COCO JSON annotations, visualization frames
 - **CLI & API**: Use from command line or integrate into Python code
@@ -27,14 +28,29 @@ smart_desk_monitor/
 │   │   ├── kalman.py       # Kalman filter for motion prediction
 │   │   ├── association.py  # IoU & Hungarian matching
 │   │   └── sort_tracker.py # SORT algorithm implementation
+│   ├── evaluation/         # Quality assessment framework
+│   │   ├── metrics.py      # Metric dataclasses (FragmentationMetrics, etc.)
+│   │   ├── analyzer.py     # TrackingAnalyzer for computing metrics
+│   │   ├── reporter.py     # Report generation (console, JSON, Markdown)
+│   │   ├── integration.py  # Pipeline integration utilities
+│   │   └── cli.py          # Evaluation CLI commands
 │   ├── io/                 # Input/Output utilities
 │   │   ├── video.py        # Video reading & frame extraction
 │   │   └── export.py       # COCO JSON & visualization export
 │   ├── pipeline.py         # Main orchestration
 │   └── cli.py              # Command-line interface
-├── tests/                  # Unit & integration tests
-├── configs/                # Configuration files
-└── pyproject.toml          # Package configuration
+├── tests/                  
+│   ├── evaluation/         # Evaluation framework tests
+│   │   ├── test_metrics.py
+│   │   ├── test_analyzer.py
+│   │   └── test_reporter.py
+│   ├── test_config.py
+│   ├── test_detection.py
+│   └── test_tracking.py
+├── configs/                
+│   ├── default.yaml        # Default configuration
+│   └── tuned.yaml          # Optimized parameters
+└── pyproject.toml          
 ```
 
 ## Installation
@@ -43,7 +59,7 @@ smart_desk_monitor/
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/smart-desk-monitor.git
+git clone https://github.com/SAMithila/smart-desk-monitor.git
 cd smart-desk-monitor
 
 # Create virtual environment
@@ -91,6 +107,25 @@ results = pipeline.process_video("video.mp4", output_dir="output/")
 
 # Or process multiple videos
 results = pipeline.process_directory("videos/", output_dir="output/")
+```
+
+### Process with Evaluation
+
+```python
+from smart_desk_monitor import DetectionTrackingPipeline
+
+pipeline = DetectionTrackingPipeline()
+
+# Process video AND get quality metrics
+results, evaluation = pipeline.process_video_with_evaluation(
+    "video.mp4",
+    output_dir="output/"
+)
+
+# Access metrics
+print(f"Overall Score: {evaluation.overall_score:.1f}/100")
+print(f"ID Switches: {evaluation.id_switches.total_switches}")
+print(f"Track Continuity: {evaluation.continuity_score:.1f}%")
 ```
 
 ### Custom Configuration
@@ -151,6 +186,110 @@ Annotations are exported in COCO format with tracking extensions:
 
 Tracked frames with bounding boxes and IDs are saved to `output/video_name/tracked/`.
 
+---
+
+## Evaluation Framework
+
+The evaluation framework provides self-supervised metrics to assess tracking quality **without requiring ground truth annotations**. This is valuable for real-world scenarios where labeled data is unavailable.
+
+### Metrics Computed
+
+| Metric | Description |
+|--------|-------------|
+| **Continuity Score** | Track completeness - penalizes gaps and fragmentation |
+| **Stability Score** | ID consistency - penalizes ID switches |
+| **Speed Score** | Processing performance relative to target FPS |
+| **Overall Score** | Weighted combination (40% continuity, 40% stability, 20% speed) |
+
+### Detailed Metrics
+
+- **Track Fragmentation**: Coverage ratio, gap count, average gap length
+- **ID Switches**: Detected using spatial proximity and IoU overlap heuristics
+- **Track Lifecycle**: Duration distribution, short track detection
+- **Performance**: FPS, frame time percentiles (P50, P95)
+
+### Usage
+
+#### Evaluate Existing Annotations
+
+```python
+from smart_desk_monitor.pipeline import evaluate_annotations
+
+# Analyze tracking quality from previous run
+result = evaluate_annotations("output/video_annotations.json")
+
+print(f"Overall Score: {result.overall_score:.1f}/100")
+print(f"Fragmented Tracks: {result.fragmentation.fragmented_tracks}")
+print(f"ID Switches: {result.id_switches.total_switches}")
+```
+
+#### Compare Multiple Videos
+
+```python
+from smart_desk_monitor.evaluation import TrackingAnalyzer, EvaluationReporter
+
+analyzer = TrackingAnalyzer()
+reporter = EvaluationReporter()
+
+results = [
+    analyzer.analyze(annotations1, video_name="video1"),
+    analyzer.analyze(annotations2, video_name="video2"),
+]
+
+# Print comparison table
+reporter.compare_results(results)
+```
+
+#### CLI Evaluation
+
+```bash
+# Evaluate single annotation file
+python run_evaluation.py
+
+# Compare all videos
+python compare_videos.py
+
+# Generate summary report
+python generate_report.py
+```
+
+### Evaluation Results
+
+Performance across test videos:
+
+| Video | Overall | Continuity | Stability | Tracks | ID Switches | Fragmented |
+|-------|---------|------------|-----------|--------|-------------|------------|
+| task3.1_video1 | 36.8 | 66.5 | 25.4 | 23 | 6 | 13 |
+| task3.1_video2 | 44.4 | 67.8 | 43.3 | 11 | 3 | 6 |
+| task3.1_video4 | 78.4 | 95.9 | 100.0 | 8 | 0 | 1 |
+| **Average** | **53.2** | **76.7** | **56.3** | **42** | **9** | **20** |
+
+### Key Findings
+
+1. **Tracker scales with scene complexity**: 
+   - Simple scenes (8 tracks) → 100% stability
+   - Complex scenes (23 tracks) → 25% stability
+
+2. **Primary bottleneck identified**: ID association in crowded scenes
+   - IoU-based matching struggles when objects are close together
+   - Recommended improvement: Add appearance features (Deep SORT)
+
+3. **Parameter sensitivity**:
+   - `max_age=8` causes premature track deletion (avg gap = 8.9 frames)
+   - `iou_threshold=0.3` rejects valid matches (avg switch IoU = 0.36)
+
+### Recommended Parameter Tuning
+
+Based on evaluation results, `configs/tuned.yaml` provides optimized settings:
+
+```yaml
+tracker:
+  max_age: 15          # Increased from 8 (handles longer occlusions)
+  iou_threshold: 0.2   # Reduced from 0.3 (fewer false ID switches)
+```
+
+---
+
 ## Development
 
 ```bash
@@ -171,12 +310,13 @@ make format
 
 This project follows software engineering best practices:
 
-1. **Separation of Concerns**: Detection, tracking, and I/O are independent modules
+1. **Separation of Concerns**: Detection, tracking, evaluation, and I/O are independent modules
 2. **Dependency Injection**: Components receive configuration, not global state
 3. **Abstract Interfaces**: `BaseDetector` allows swapping detection backends
 4. **Type Safety**: Full type hints enable IDE support and catch errors early
 5. **Configuration as Code**: YAML configs with typed dataclasses
 6. **CLI + API**: Both programmatic and command-line interfaces
+7. **Self-Supervised Evaluation**: Quality metrics without ground truth dependency
 
 ## Extending the Pipeline
 
@@ -191,30 +331,16 @@ class YOLODetector(BaseDetector):
         pass
 ```
 
-## Evaluation Results
+### Adding Custom Evaluation Metrics
 
-This project includes a self-supervised evaluation framework that measures tracking quality without ground truth annotations.
+```python
+from smart_desk_monitor.evaluation import TrackingAnalyzer
 
-### Performance Summary
-
-| Video | Overall | Continuity | Stability | Tracks | ID Switches |
-|-------|---------|------------|-----------|--------|-------------|
-| task3.1_video1 | 36.8 | 66.5 | 25.4 | 23 | 6 |
-| task3.1_video2 | 44.4 | 67.8 | 43.3 | 11 | 3 |
-| task3.1_video4 | 78.4 | 95.9 | 100.0 | 8 | 0 |
-| **Average** | **53.2** | **76.7** | **56.3** | - | - |
-
-### Key Metrics Explained
-
-- **Continuity Score**: Measures track completeness (fewer gaps = higher score)
-- **Stability Score**: Measures ID consistency (fewer ID switches = higher score)
-- **Overall Score**: Weighted combination of all metrics
-
-### Findings
-
-- Tracker achieves 100% stability on simple scenes (≤8 objects)
-- Performance degrades with scene complexity (more concurrent tracks)
-- Primary bottleneck: ID association in crowded scenes
+class CustomAnalyzer(TrackingAnalyzer):
+    def _compute_custom_metric(self, frame_annotations):
+        # Your custom metric logic
+        pass
+```
 
 ## License
 
