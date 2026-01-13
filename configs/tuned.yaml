@@ -1,0 +1,34 @@
+# Tuned configuration for better tracking continuity
+# Based on evaluation results showing:
+# - 56.5% fragmentation (gaps avg 8.9 frames)
+# - 6 ID switches (avg IoU 0.36)
+
+detector:
+  device: "cpu"
+  default_confidence: 0.3
+
+tracker:
+  # CHANGED: Increased from 8 to 15
+  # Reason: Average gap length was 8.9 frames, so tracks were being
+  # deleted before objects reappeared. 15 frames = 250ms at 60fps,
+  # giving more time for temporary occlusions.
+  max_age: 15
+  
+  # CHANGED: Reduced from 0.3 to 0.2
+  # Reason: ID switches had avg IoU of 0.36, meaning valid matches
+  # were being rejected. Lowering threshold allows more matches.
+  iou_threshold: 0.2
+  
+  # Keep same
+  min_hits: 3
+
+video:
+  max_frames: 100
+  extensions: [".mp4", ".avi", ".mov"]
+
+output:
+  output_dir: "output_tuned"  # Separate output folder
+  save_tracked_frames: true
+  save_coco_json: true
+
+log_level: "INFO"
