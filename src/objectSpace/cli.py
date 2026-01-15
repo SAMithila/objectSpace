@@ -1,5 +1,5 @@
 """
-Command-line interface for Smart Desk Monitor.
+Command-line interface for ObjectSpace.
 
 Usage:
     ObjectSpace process video.mp4 --output output/
