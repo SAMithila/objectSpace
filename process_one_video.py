@@ -2,7 +2,7 @@
 """Process a single video with reduced memory usage."""
 
 import sys
-from smart_desk_monitor.pipeline import DetectionTrackingPipeline
+from objectSpace.pipeline import DetectionTrackingPipeline
 
 
 def main():

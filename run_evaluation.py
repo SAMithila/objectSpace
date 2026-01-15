@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 """Evaluate existing tracking results (no reprocessing needed)."""
 
-from smart_desk_monitor.pipeline import evaluate_annotations
+from objectSpace.pipeline import evaluate_annotations
+
 
 def main():
     # Evaluate your existing annotations - instant, no GPU/memory needed!
@@ -22,6 +23,7 @@ def main():
     print(f"Total Tracks:     {result.tracks.total_tracks}")
     print(f"ID Switches:      {result.id_switches.total_switches}")
     print(f"Fragmented Tracks: {result.fragmentation.fragmented_tracks}")
+
 
 if __name__ == "__main__":
     main()

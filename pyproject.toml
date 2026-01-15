@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "smart-desk-monitor"
+name = "objectspace"
 version = "0.1.0"
 description = "Object detection and tracking pipeline for desk/workspace monitoring"
 readme = "README.md"
@@ -55,19 +55,19 @@ docs = [
 ]
 
 [project.scripts]
-smart-desk-monitor = "smart_desk_monitor.cli:main"
++objectspace = "objectspace.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/smart-desk-monitor"
-Documentation = "https://github.com/yourusername/smart-desk-monitor#readme"
-Repository = "https://github.com/yourusername/smart-desk-monitor"
-Issues = "https://github.com/yourusername/smart-desk-monitor/issues"
+Homepage = "https://github.com/yourusername/objectspace"
+Documentation = "https://github.com/yourusername/objectspace#readme"
+Repository = "https://github.com/yourusername/objectspace"
+Issues = "https://github.com/yourusername/objectspace/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-smart_desk_monitor = ["py.typed"]
+objectspace = ["py.typed"]
 
 [tool.black]
 line-length = 88
@@ -77,7 +77,7 @@ include = '\.pyi?$'
 [tool.isort]
 profile = "black"
 line_length = 88
-known_first_party = ["smart_desk_monitor"]
+known_first_party = ["objectspace"]
 
 [tool.mypy]
 python_version = "3.9"
@@ -86,7 +86,7 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 ignore_missing_imports = true
 show_error_codes = true
-files = ["src/smart_desk_monitor"]
+files = ["src/objectspace"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

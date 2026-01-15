@@ -2,10 +2,10 @@
 Command-line interface for Smart Desk Monitor.
 
 Usage:
-    smart-desk-monitor process video.mp4 --output output/
-    smart-desk-monitor process videos/ --output output/
-    smart-desk-monitor config --show
-    smart-desk-monitor config --generate config.yaml
+    ObjectSpace process video.mp4 --output output/
+    ObjectSpace process videos/ --output output/
+    ObjectSpace config --show
+    ObjectSpace config --generate config.yaml
 """
 
 import argparse
@@ -22,40 +22,41 @@ from .pipeline import run_pipeline
 def create_parser() -> argparse.ArgumentParser:
     """Create the argument parser."""
     parser = argparse.ArgumentParser(
-        prog="smart-desk-monitor",
+        prog="objectSpace",
         description="Object detection and tracking for desk monitoring",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   Process a single video:
-    smart-desk-monitor process video.mp4 -o output/
+    objectSpace process video.mp4 -o output/
 
   Process all videos in a directory:
-    smart-desk-monitor process videos/ -o output/
+    objectSpace process videos/ -o output/
 
   Use a custom config file:
-    smart-desk-monitor process video.mp4 -c config.yaml -o output/
+    objectSpace process video.mp4 -c config.yaml -o output/
 
   Generate a default config file:
-    smart-desk-monitor config --generate my_config.yaml
+    objectSpace config --generate my_config.yaml
         """,
     )
-    
+
     parser.add_argument(
         "--version",
         action="version",
         version=f"%(prog)s {__version__}",
     )
-    
+
     parser.add_argument(
         "-v", "--verbose",
         action="count",
         default=0,
         help="Increase verbosity (use -vv for debug)",
     )
-    
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-    
+
+    subparsers = parser.add_subparsers(
+        dest="command", help="Available commands")
+
     # Process command
     process_parser = subparsers.add_parser(
         "process",
@@ -93,7 +94,7 @@ Examples:
         default=[],
         help="Filename patterns to exclude",
     )
-    
+
     # Config command
     config_parser = subparsers.add_parser(
         "config",
@@ -111,7 +112,7 @@ Examples:
         metavar="FILE",
         help="Generate a default config file",
     )
-    
+
     return parser
 
 
@@ -123,7 +124,7 @@ def setup_logging(verbosity: int) -> None:
         level = logging.INFO
     else:
         level = logging.WARNING
-    
+
     logging.basicConfig(
         level=level,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -135,22 +136,23 @@ def cmd_process(args: argparse.Namespace) -> int:
     # Load config
     if args.config:
         if not args.config.exists():
-            print(f"Error: Config file not found: {args.config}", file=sys.stderr)
+            print(
+                f"Error: Config file not found: {args.config}", file=sys.stderr)
             return 1
         config = PipelineConfig.from_yaml(args.config)
     else:
         config = get_default_config()
-    
+
     # Override config with CLI args
     config.output.output_dir = args.output
     if args.num_frames:
         config.video.max_frames = args.num_frames
-    
+
     # Validate input
     if not args.input.exists():
         print(f"Error: Input not found: {args.input}", file=sys.stderr)
         return 1
-    
+
     # Run pipeline
     try:
         results = run_pipeline(
@@ -160,13 +162,13 @@ def cmd_process(args: argparse.Namespace) -> int:
             exclude_patterns=args.exclude,
             show_progress=not args.no_progress,
         )
-        
+
         print(f"\nProcessing complete!")
         print(f"Processed {len(results)} video(s)")
         print(f"Results saved to: {args.output}")
-        
+
         return 0
-        
+
     except Exception as e:
         logging.exception("Pipeline failed")
         print(f"Error: {e}", file=sys.stderr)
@@ -176,7 +178,7 @@ def cmd_process(args: argparse.Namespace) -> int:
 def cmd_config(args: argparse.Namespace) -> int:
     """Handle the config command."""
     config = get_default_config()
-    
+
     if args.show:
         import yaml
         # Convert to dict and print
@@ -203,12 +205,12 @@ def cmd_config(args: argparse.Namespace) -> int:
         }
         print(yaml.dump(config_dict, default_flow_style=False, sort_keys=False))
         return 0
-    
+
     if args.generate:
         config.to_yaml(args.generate)
         print(f"Generated config file: {args.generate}")
         return 0
-    
+
     return 1
 
 
@@ -216,18 +218,18 @@ def main(argv: Optional[list] = None) -> int:
     """Main entry point."""
     parser = create_parser()
     args = parser.parse_args(argv)
-    
+
     if not args.command:
         parser.print_help()
         return 0
-    
+
     setup_logging(args.verbose)
-    
+
     if args.command == "process":
         return cmd_process(args)
     elif args.command == "config":
         return cmd_config(args)
-    
+
     return 1
 
 

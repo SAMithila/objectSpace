@@ -1,16 +1,16 @@
 """
-Smart Desk Monitor - Object Detection and Tracking Pipeline.
+ObjectSpace - Object Detection and Tracking Pipeline.
 
 A production-quality video analysis system for detecting and tracking
 objects in desk/workspace monitoring scenarios.
 
 Example:
-    >>> from smart_desk_monitor import DetectionTrackingPipeline
+    >>> from ObjectSpace import DetectionTrackingPipeline
     >>> pipeline = DetectionTrackingPipeline()
     >>> results = pipeline.process_video("video.mp4")
 
 For quick usage:
-    >>> from smart_desk_monitor import run_pipeline
+    >>> from ObjectSpace import run_pipeline
     >>> results = run_pipeline("videos/", output_dir="output/")
 """
 

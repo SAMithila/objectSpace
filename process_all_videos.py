@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Process all videos in the data folder."""
 
-from smart_desk_monitor.pipeline import DetectionTrackingPipeline
+from objectSpace.pipeline import DetectionTrackingPipeline
 
 
 def main():
