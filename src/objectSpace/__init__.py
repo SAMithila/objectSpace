@@ -26,7 +26,7 @@ from .config import (
     COCO_CLASSES,
     get_default_config,
 )
-from .pipeline import DetectionTrackingPipeline, run_pipeline
+from objectSpace.pipeline import DetectionTrackingPipeline, run_pipeline
 
 __all__ = [
     # Version info
