@@ -1,4 +1,4 @@
-# Smart Desk Monitor
+# ObjectSpace
 
 > 🎯 A production-quality object detection & tracking pipeline for workspace monitoring — demonstrating real-world ML engineering with self-supervised evaluation metrics.
 
@@ -56,8 +56,8 @@ The built-in evaluation framework measures tracking quality **without ground tru
 ## 🏗️ Architecture
 
 ```
-smart_desk_monitor/
-├── src/smart_desk_monitor/
+objectSpace/
+├── src/objectSpace/
 │   ├── detection/          # Mask R-CNN object detection
 │   ├── tracking/           # SORT with Kalman filtering
 │   ├── evaluation/         # Self-supervised quality metrics
@@ -76,8 +76,8 @@ smart_desk_monitor/
 ### Installation
 
 ```bash
-git clone https://github.com/SAMithila/smart-desk-monitor.git
-cd smart-desk-monitor
+git clone https://github.com/SAMithila/objectSpace.git
+cd objectSpace
 python -m venv venv
 source venv/bin/activate
 pip install -e ".[dev]"
@@ -86,7 +86,7 @@ pip install -e ".[dev]"
 ### Process a Video
 
 ```python
-from smart_desk_monitor import DetectionTrackingPipeline
+from objectSpace import DetectionTrackingPipeline
 
 pipeline = DetectionTrackingPipeline()
 results = pipeline.process_video("video.mp4", output_dir="output/")
@@ -106,10 +106,10 @@ print(f"ID Switches: {evaluation.id_switches.total_switches}")
 
 ```bash
 # Process single video
-smart-desk-monitor process video.mp4 -o output/
+objectSpace process video.mp4 -o output/
 
 # Process directory
-smart-desk-monitor process videos/ -o output/
+objectSpace process videos/ -o output/
 ```
 
 ---
@@ -130,7 +130,7 @@ The evaluation module computes tracking quality **without ground truth annotatio
 ### Usage
 
 ```python
-from smart_desk_monitor.pipeline import evaluate_annotations
+from objectSpace.pipeline import evaluate_annotations
 
 # Evaluate existing tracking results
 result = evaluate_annotations("output/video_annotations.json")
@@ -233,7 +233,7 @@ make check
 ### Add New Detector
 
 ```python
-from smart_desk_monitor.detection import BaseDetector
+from objectSpace.detection import BaseDetector
 
 class YOLODetector(BaseDetector):
     def detect(self, frame):
@@ -244,7 +244,7 @@ class YOLODetector(BaseDetector):
 ### Add Custom Metrics
 
 ```python
-from smart_desk_monitor.evaluation import TrackingAnalyzer
+from objectSpace.evaluation import TrackingAnalyzer
 
 class CustomAnalyzer(TrackingAnalyzer):
     def compute_custom_metric(self, annotations):
