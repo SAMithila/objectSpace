@@ -1,13 +1,12 @@
-🎯 ObjectSpace — Production-Quality Object Detection & Tracking Pipeline
+# ObjectSpace
 
-ObjectSpace is a modular, end-to-end pipeline for object detection and multi-object tracking in videos, designed for workspace monitoring with self-supervised evaluation metrics—all without requiring labeled data.
-
+> 🎯 A production-quality object detection & tracking pipeline for workspace monitoring — demonstrating real-world ML engineering with self-supervised evaluation metrics.
 
 ![Demo](assets/demo.gif)
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![CI](https://github.com/SAMithila/objectSpace/actions/workflows/ci.yml/badge.svg)](https://github.com/SAMithila/objectSpace/actions)
 
 ---
 
@@ -46,7 +45,7 @@ The built-in evaluation framework measures tracking quality **without ground tru
 | video4 (simple) | 78.4 | 95.9 | 100.0 | 8 | 0 |
 | **Average** | **53.2** | **76.7** | **56.3** | - | - |
 
-### Insights:
+### Key Findings
 
 - ✅ **100% stability** on simple scenes (≤8 concurrent tracks)
 - ⚠️ **Stability degrades** with scene complexity (IoU-based matching limitation)
@@ -60,14 +59,33 @@ The built-in evaluation framework measures tracking quality **without ground tru
 objectSpace/
 ├── src/objectSpace/
 │   ├── detection/          # Mask R-CNN object detection
+│   │   ├── base.py         # Abstract detector interface
+│   │   └── mask_rcnn.py    # Mask R-CNN implementation
 │   ├── tracking/           # SORT with Kalman filtering
+│   │   ├── kalman.py       # Kalman filter implementation
+│   │   ├── association.py  # IoU & Hungarian matching
+│   │   └── sort_tracker.py # SORT algorithm
 │   ├── evaluation/         # Self-supervised quality metrics
+│   │   ├── metrics.py      # Metric dataclasses
+│   │   ├── analyzer.py     # TrackingAnalyzer
+│   │   ├── reporter.py     # Report generation
+│   │   └── integration.py  # Pipeline integration
 │   ├── io/                 # Video I/O and COCO export
+│   │   ├── video.py        # Video reading
+│   │   └── export.py       # COCO JSON export
 │   ├── pipeline.py         # Main orchestration
 │   └── config.py           # Typed configuration
 ├── tests/                  # Unit & integration tests
+│   ├── evaluation/         # Evaluation module tests
+│   ├── test_detection.py
+│   └── test_tracking.py
+├── examples/               # Demo notebooks
+│   └── demo.ipynb          # Interactive demo
 ├── configs/                # YAML configurations
+│   ├── default.yaml
+│   └── tuned.yaml
 └── assets/                 # Demo media
+    └── demo.gif
 ```
 
 ---
@@ -107,10 +125,13 @@ print(f"ID Switches: {evaluation.id_switches.total_switches}")
 
 ```bash
 # Process single video
-objectSpace process video.mp4 -o output/
+python process_one_video.py task3.1_video1
 
-# Process directory
-objectSpace process videos/ -o output/
+# Evaluate existing results
+python run_evaluation.py
+
+# Compare all videos
+python compare_videos.py
 ```
 
 ---
@@ -189,16 +210,13 @@ tracker:
 
 ```bash
 # Run tests
-make test
+pytest tests/ -v
 
-# Run linter
-make lint
+# Run specific test module
+pytest tests/evaluation/ -v
 
-# Format code
-make format
-
-# All checks
-make check
+# Run with coverage
+pytest tests/ --cov=objectSpace --cov-report=term-missing
 ```
 
 ---
@@ -229,6 +247,19 @@ make check
 
 ---
 
+## 📚 Technical Highlights
+
+This project demonstrates:
+
+1. **Modular Design** — Separate concerns for detection, tracking, evaluation
+2. **Type Safety** — Full type hints with dataclasses
+3. **Configuration Management** — YAML configs with typed validation
+4. **Self-Supervised ML** — Quality metrics without labeled data
+5. **Production Patterns** — Logging, error handling, CLI interface
+6. **CI/CD** — GitHub Actions for automated testing
+
+---
+
 ## 🛠️ Extending
 
 ### Add New Detector
@@ -255,18 +286,6 @@ class CustomAnalyzer(TrackingAnalyzer):
 
 ---
 
-## 📚 Technical Highlights
-
-This project demonstrates:
-
-1. **Modular Design** — Separate concerns for detection, tracking, evaluation
-2. **Type Safety** — Full type hints with dataclasses
-3. **Configuration Management** — YAML configs with typed validation
-4. **Self-Supervised ML** — Quality metrics without labeled data
-5. **Production Patterns** — Logging, error handling, CLI interface
-
----
-
 ## 📄 License
 
 MIT License — see [LICENSE](LICENSE) for details.
@@ -275,4 +294,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 - [SORT](https://arxiv.org/abs/1602.00763) — Bewley et al.
 - [Mask R-CNN](https://arxiv.org/abs/1703.06870) — He et al.
-- [torchvision](https://pytorch.org/vision/) — Pre-trained models# CI trigger test
+- [torchvision](https://pytorch.org/vision/) — Pre-trained models
