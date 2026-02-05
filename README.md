@@ -290,7 +290,7 @@ class CustomAnalyzer(TrackingAnalyzer):
 
 MIT License — see [LICENSE](LICENSE) for details.
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - [SORT](https://arxiv.org/abs/1602.00763) — Bewley et al.
 - [Mask R-CNN](https://arxiv.org/abs/1703.06870) — He et al.
