@@ -1,6 +1,6 @@
 # ObjectSpace
 
-> 🎯 A production-quality object detection & tracking pipeline for workspace monitoring — demonstrating real-world ML engineering with self-supervised evaluation metrics.
+>  A production-quality object detection & tracking pipeline for workspace monitoring — demonstrating real-world ML engineering with self-supervised evaluation metrics.
 
 ![Demo](assets/demo.gif)
 
@@ -10,7 +10,7 @@
 
 ---
 
-## 🚀 Why This Project?
+##  Why This Project?
 
 Smart workspace monitoring enables:
 - **Productivity analytics** — Track object interactions over time
@@ -21,7 +21,7 @@ This project demonstrates **end-to-end ML pipeline engineering**: from raw video
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 | Feature | Description |
 |---------|-------------|
@@ -34,7 +34,7 @@ This project demonstrates **end-to-end ML pipeline engineering**: from raw video
 
 ---
 
-## 📊 Evaluation Results
+##  Evaluation Results
 
 The built-in evaluation framework measures tracking quality **without ground truth**:
 
@@ -47,13 +47,13 @@ The built-in evaluation framework measures tracking quality **without ground tru
 
 ### Key Findings
 
-- ✅ **100% stability** on simple scenes (≤8 concurrent tracks)
-- ⚠️ **Stability degrades** with scene complexity (IoU-based matching limitation)
-- 🔧 **Identified bottleneck**: ID association in crowded scenes → recommends Deep SORT
+-  **100% stability** on simple scenes (≤8 concurrent tracks)
+-  **Stability degrades** with scene complexity (IoU-based matching limitation)
+-  **Identified bottleneck**: ID association in crowded scenes → recommends Deep SORT
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 objectSpace/
@@ -90,7 +90,7 @@ objectSpace/
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Installation
 
@@ -136,7 +136,7 @@ python compare_videos.py
 
 ---
 
-## 📈 Evaluation Framework
+##  Evaluation Framework
 
 The evaluation module computes tracking quality **without ground truth annotations**:
 
@@ -183,7 +183,7 @@ AVERAGE                       53.2     76.7     56.3      0.0      42
 
 ---
 
-## ⚙️ Configuration
+##  Configuration
 
 Default settings in `configs/default.yaml`:
 
@@ -206,7 +206,7 @@ tracker:
 
 ---
 
-## 🧪 Development
+##  Development
 
 ```bash
 # Run tests
@@ -221,7 +221,7 @@ pytest tests/ --cov=objectSpace --cov-report=term-missing
 
 ---
 
-## 📁 Output Format
+##  Output Format
 
 ### COCO JSON with Tracking
 
@@ -247,7 +247,7 @@ pytest tests/ --cov=objectSpace --cov-report=term-missing
 
 ---
 
-## 📚 Technical Highlights
+##  Technical Highlights
 
 This project demonstrates:
 
@@ -260,7 +260,7 @@ This project demonstrates:
 
 ---
 
-## 🛠️ Extending
+##  Extending
 
 ### Add New Detector
 
@@ -286,7 +286,7 @@ class CustomAnalyzer(TrackingAnalyzer):
 
 ---
 
-## 📄 License
+##  License
 
 MIT License — see [LICENSE](LICENSE) for details.
 
